@@ -7,7 +7,9 @@ version = project.mod_version
 group   = project.maven_group
 
 base {
-	archivesName = "Q Toggle 1.20.1-1.21.9"
+	// Pakai archives_base_name dari gradle.properties, bukan hardcode,
+	// supaya tidak ada dua sumber kebenaran untuk nama jar.
+	archivesName = project.archives_base_name
 }
 
 java {
