@@ -106,17 +106,23 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
+      # gradlew tidak ada di repo → download binary Gradle langsung dari releases,
+      # ekstrak, jadikan ./gradlew. Cara ini bypass "gradle wrapper" task yang
+      # conflict dengan settings.gradle (dependencyResolutionManagement).
+      - name: Install gradlew
+        run: |
+          VER="${{ matrix.gradle }}"
+          ZIP="gradle-${VER}-bin.zip"
+          curl -fL "https://services.gradle.org/distributions/${ZIP}" -o /tmp/${ZIP}
+          unzip -q /tmp/${ZIP} -d /tmp/gradle-dist
+          cp /tmp/gradle-dist/gradle-${VER}/bin/gradle ./gradlew
+          chmod +x ./gradlew
+          # Tulis gradle-wrapper.properties agar setup-gradle bisa cache dengan benar
+          mkdir -p gradle/wrapper
+          printf 'distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-%s-bin.zip\nnetworkTimeout=10000\nvalidateDistributionUrl=true\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n' "${VER}" > gradle/wrapper/gradle-wrapper.properties
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: ${{ matrix.gradle }}
-
-      # gradlew tidak ada di repo → generate dulu pakai binary gradle dari setup-gradle
-      - name: Generate Gradle Wrapper
-        run: gradle wrapper --gradle-version ${{ matrix.gradle }}
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
 
       # Override gradle.properties sesuai versi matrix
       - name: Override gradle.properties
