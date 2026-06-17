@@ -57,7 +57,7 @@ public class QToggleClient implements ClientModInitializer {
             if (!dropEnabled) {
                 Options options = client.options;
                 
-                // Ambil keybinding Q drop dengan null safety
+                // Ambil keybinding Q drop dengan null safety check
                 KeyMapping dropKey = options.keyDrop;
                 if (dropKey != null) {
                     // Pastikan key tidak aktif
