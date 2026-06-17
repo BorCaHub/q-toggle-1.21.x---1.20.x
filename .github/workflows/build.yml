@@ -14,18 +14,23 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      # Pin Gradle yang dipakai untuk men-generate wrapper ke 8.14.
+      # Tanpa ini, gradle/actions/setup-gradle akan memasang Gradle terbaru
+      # di runner (misal 9.5.1), dan command "gradle wrapper" di bawah akan
+      # memakai Gradle global itu untuk meng-evaluasi build.gradle terlebih
+      # dahulu (root project, bukan sub-project, jadi --configure-on-demand
+      # tidak membantu) — sehingga plugin Loom 1.9.2 gagal di-resolve oleh
+      # Gradle versi tersebut meski Loom mengklaim mendukung Gradle 9.0.
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14'
 
-      # Gradle 8.x — direkomendasikan untuk Loom 1.6–1.9
-      # (Loom 1.9+ juga mendukung Gradle 9 jika mau upgrade)
-      # --configure-on-demand: cegah Gradle global runner ikut meng-evaluasi
-      # build.gradle (dan resolve plugin Loom) sebelum wrapper sempat dibuat.
-      # Tanpa ini, "gradle wrapper" bisa gagal dengan error "Plugin ... was not found"
-      # karena plugin block di build.gradle dievaluasi oleh Gradle versi runner,
-      # bukan oleh Gradle 8.14 yang baru mau digenerate.
+      # Generate wrapper sekarang dijalankan oleh Gradle 8.14 (sesuai pin di atas),
+      # jadi resolusi plugin Loom 1.9.2 terjadi dengan Gradle versi yang sama
+      # dengan yang akan dipakai gradlew untuk build sesungguhnya.
       - name: Generate Gradle Wrapper
-        run: gradle wrapper --gradle-version 8.14 --configure-on-demand
+        run: gradle wrapper --gradle-version 8.14
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
