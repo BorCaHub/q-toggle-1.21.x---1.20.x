@@ -89,7 +89,7 @@ jobs:
           - mc: "1.21.9"
             fabric: "0.134.1+1.21.9"
             loader: "0.17.2"
-            loom:   "1.10.3"
+            loom:   "1.11.7"
             java:   "21"
             gradle: "8.14"
 
@@ -128,8 +128,13 @@ jobs:
         if: matrix.mc == '1.20.1'
         run: sed -i "s/it.options.release = 21/it.options.release = 17/" build.gradle
 
+      - name: Clean Gradle cache
+        run: |
+          rm -rf ~/.gradle/caches/modules-2/files-2.1/net.fabricmc/
+          rm -rf .gradle/loom-cache/
+
       - name: Build mod
-        run: ./gradlew build --info
+        run: ./gradlew clean build --info
 
       - name: Rename jar
         run: |
