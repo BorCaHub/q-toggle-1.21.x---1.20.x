@@ -68,7 +68,8 @@ jobs:
         run: sed -i "s/it.options.release = .*/it.options.release = ${{ matrix.java }}/" build.gradle
 
       - name: Set rentang versi Minecraft di fabric.mod.json
-        run: sed -i "s/\"minecraft\": \">=1.20\"/\"minecraft\": \"${{ matrix.range }}\"/" src/main/resources/fabric.mod.json
+        run: |
+          sed -i "s/\"minecraft\": \">=1.20\"/\"minecraft\": \"${{ matrix.range }}\"/" src/main/resources/fabric.mod.json
 
       - name: Clean Gradle cache
         run: |
